@@ -2,21 +2,18 @@ import React from 'react';
 import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-
+import Book from './book';
 class BookShelves extends Component {
     static propTypes = {
         books: PropTypes.array.isRequired,
-        shelves: PropTypes.array.isRequired
+        shelves: PropTypes.array.isRequired,
+        selectShelf: PropTypes.func.isRequired
     }
-    selectShelf = (book, e) => {
-        let newShelf = e.target.value;
-        this.props.changeShelf(book, newShelf);
-    }
+    
     render() {
-        const { books, shelves } = this.props;
+        const { books, shelves, selectShelf } = this.props;
         let ShowingShelves = shelves;
         let Showingbooks = books;
-        let thumbnail = 'imgs/default.png';
         return (
             <div className="list-books">
                 <div className="list-books-title">
@@ -31,21 +28,7 @@ class BookShelves extends Component {
                                     <ol className="books-grid">
                                         {Showingbooks.filter((book) => { return book.shelf === `${shelf.key}` }).map((book) => (
                                             <li key={book.id}>
-                                                <div className="book">
-                                                    <div className="book-top">
-                                                        <div className="book-cover" style={book.imageLinks ? { backgroundImage: `url(${book.imageLinks.thumbnail})` } : { backgroundImage: `url( ${thumbnail} )` }}></div>
-                                                        <div className="book-shelf-changer">
-                                                            <select value={book.shelf} onChange={(e) => this.selectShelf(book, e)}>
-                                                                <option value="move" disabled>Move to...</option>
-                                                                {ShowingShelves.map((shelf) => (
-                                                                    <option key={shelf.key} value={shelf.key}>{shelf.name}</option>
-                                                                ))}
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div className="book-title">{book.title}</div>
-                                                    <div className="book-authors">{book.authors && book.authors.map((author) => (<div key={author}>{author}</div>))}</div>
-                                                </div>
+                                                <Book shelves={shelves} _Shelf={book.shelf} book={book} selectShelf={selectShelf} />
                                             </li>
                                         )
 
@@ -58,7 +41,6 @@ class BookShelves extends Component {
                     </div>
                 </div>
                 <div className="open-search">
-                    {/* <a onClick={() => this.setState({ showSearchPage: true })}>Add a book</a> */}
                     <Link to="/search">Add a book</Link>
                 </div>
 

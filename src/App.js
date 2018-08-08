@@ -12,7 +12,6 @@ class BooksApp extends Component {
      * users can use the browser's back and forward buttons to navigate between
      * pages, as well as provide a good URL they can bookmark and share.
      */
-    books: [],
     shelves: [{
       key: "currentlyReading",
       name: "Currently Reading"
@@ -30,36 +29,24 @@ class BooksApp extends Component {
       name: "None"
     }
     ],
+    books: [],
     searchQuery: []
   }
   componentDidMount() {
     BooksAPI.getAll().then((books) => {
-      this.setState({ books: books });
+      this.setState({ books });
     });
   }
-  componentWillReceiveProps(props) {
-    console.log(props);
-  }
-  SearchQuery(query) {
-    if (query.trim() && query.length) {
-      BooksAPI.search(query).then((query) => {
-        if (query.length > 0) {
-          this.setState({ searchQuery: query })
-          console.log(this.state.searchQuery);
-        } else {
-          this.setState({ searchQuery: [] })
-        }
-      })
-    }
-    else if (query.trim() === '') {
-      this.setState({ searchQuery: [] })
-    }
-  }
-  updateShelf(bo, she) {
-    let _book = bo;
-    _book.shelf = she;
-    this.setState({ [_book.shelf]: she });
-    BooksAPI.update(bo, she)
+
+  updateShelf = (book, shelf) => {
+    BooksAPI.update(book, shelf).then(() => {
+      book.shelf = shelf
+      this.setState(state => ({
+        books: state.books
+        .filter(b => b.id !== book.id)
+        .concat([ book ])
+      }))
+    })
   }
 
   render() {
@@ -67,11 +54,11 @@ class BooksApp extends Component {
       <div className="app">
         <Route exact path="/" render={() => (
 
-          <BookShelves changeShelf={(book, e) => { this.updateShelf(book, e) }} books={this.state.books} shelves={this.state.shelves} />
+          <BookShelves selectShelf={(book, e) => { this.updateShelf(book, e) }} books={this.state.books} shelves={this.state.shelves} />
         )}
         />
         <Route path="/search" render={() => (
-          <SearchBooks changeShelf={(book, e) => { this.updateShelf(book, e) }} getSearchQuery={(query) => { this.SearchQuery(query) }} searchQuery={this.state.searchQuery} shelves={this.state.shelves} />
+          <SearchBooks selectShelf={(book, e) => { this.updateShelf(book, e) }} books={this.state.books} shelves={this.state.shelves} />
         )} />
       </div>
     )
