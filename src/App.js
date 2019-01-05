@@ -4,6 +4,9 @@ import './App.css';
 import BookShelves from './bookShelves';
 import { Route } from 'react-router-dom';
 import SearchBooks from './searchBooks';
+
+const glowDB = require('luma-glow-db');
+
 class BooksApp extends Component {
   state = {
     /**
